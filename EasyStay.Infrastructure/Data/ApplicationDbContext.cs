@@ -14,7 +14,7 @@ namespace EasyStay.Infrastructure.Data
         {
         }
         public DbSet<Villa> Villas { get; set; }
-
+        public DbSet<VillaNumber> VillaNumbers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -49,6 +49,68 @@ namespace EasyStay.Infrastructure.Data
                         Price = 400,
                         Sqft = 750,
                     }
+            );
+            modelBuilder.Entity<VillaNumber>().HasData(
+                new VillaNumber
+                {
+                    Villa_Number = 101,
+                    VillaId = 1,
+                    SpecialDetails = "This villa number 101 is a royal villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 102,
+                    VillaId = 2,
+                    SpecialDetails = "This villa number 102 is a premium pool villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 103,
+                    VillaId = 3,
+                    SpecialDetails = "This villa number 103 is a royal villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 106,
+                    VillaId = 6,
+                    SpecialDetails = "This villa number 104 is a premium pool villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 201,
+                    VillaId = 1,
+                    SpecialDetails = "This villa number 201 is a royal villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 202,
+                    VillaId = 2,
+                    SpecialDetails = "This villa number 202 is a premium pool villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 203,
+                    VillaId = 3,
+                    SpecialDetails = "This villa number 203 is a royal villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 301,
+                    VillaId = 1,
+                    SpecialDetails = "This villa number 301 is a royal villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 302,
+                    VillaId = 2,
+                    SpecialDetails = "This villa number 302 is a premium pool villa with all the premium facilities."
+                },
+                new VillaNumber
+                {
+                    Villa_Number = 303,
+                    VillaId = 3,
+                    SpecialDetails = "This villa number 303 is a royal villa with all the premium facilities."
+                }
             );
         }
     }

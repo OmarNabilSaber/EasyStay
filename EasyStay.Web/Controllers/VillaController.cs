@@ -23,18 +23,18 @@ namespace EasyStay.Web.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Villa villa)
+        public IActionResult Create(Villa obj)
         {
             
             if (ModelState.IsValid)
             {
-                _db.Villas.Add(villa);
+                _db.Villas.Add(obj);
                 _db.SaveChanges();
                 TempData["success"] = "The villa has been created successfully";
                 return RedirectToAction("Index","Villa");
             }
             TempData["error"] = "The villa can't be created";
-            return View(villa);
+            return View(obj);
         }
         [HttpGet]
         public IActionResult Update(int villaId)
@@ -47,17 +47,17 @@ namespace EasyStay.Web.Controllers
             return View(villa);
         }
         [HttpPost]
-        public IActionResult Update(Villa villa)
+        public IActionResult Update(Villa obj)
         {
             if (ModelState.IsValid)
             {
-                _db.Villas.Update(villa);
+                _db.Villas.Update(obj);
                 _db.SaveChanges();
                 TempData["success"] = "The villa has been updated successfully";
                 return RedirectToAction("Index", "Villa");
             }
             TempData["error"] = "The villa can't be updated";
-            return View(villa);
+            return View(obj);
         }
         [HttpGet]
         public IActionResult Delete(int villaId)
@@ -70,9 +70,9 @@ namespace EasyStay.Web.Controllers
             return View(villa);
         }
         [HttpPost]
-        public IActionResult Delete(Villa villa)
+        public IActionResult Delete(Villa obj)
         {
-            Villa? villaFromDb = _db.Villas.FirstOrDefault(v => v.Id == villa.Id);
+            Villa? villaFromDb = _db.Villas.FirstOrDefault(v => v.Id == obj.Id);
 
             if (villaFromDb is not null)
             {
@@ -82,7 +82,7 @@ namespace EasyStay.Web.Controllers
                 return RedirectToAction("Index", "Villa");
             }
             TempData["error"] = "The villa can't be deleted";
-            return View(villa);
+            return View(obj);
         }
     }
 }
