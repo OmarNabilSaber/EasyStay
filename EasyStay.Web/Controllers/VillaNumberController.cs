@@ -80,9 +80,9 @@ namespace EasyStay.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.VillaNumbers.Add(villaNumberVM.VillaNumber);
+                _db.VillaNumbers.Update(villaNumberVM.VillaNumber);
                 _db.SaveChanges();
-                TempData["success"] = "The villa Number has been created successfully";
+                TempData["success"] = "The villa Number has been updated successfully";
                 return RedirectToAction("Index", "VillaNumber");
             }
 
@@ -96,27 +96,40 @@ namespace EasyStay.Web.Controllers
         [HttpGet]
         public IActionResult Delete(int villaNumberId)
         {
-            VillaNumber? obj = _db.VillaNumbers.FirstOrDefault(u => u.Villa_Number == villaNumberId);
-            if (obj is null)
+            VillaNumberVM villaNumber = new()
             {
-                return RedirectToAction("Error","Home");
+                VillaList = _db.Villas.Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                }),
+                VillaNumber = _db.VillaNumbers.FirstOrDefault(u => u.Villa_Number == villaNumberId)
+            };
+            if (villaNumber.VillaNumber is null)
+            {
+                return RedirectToAction("Error", "Home");
             }
-            return View(obj);
+            return View(villaNumber);
         }
         [HttpPost]
-        public IActionResult Delete(VillaNumber obj)
+        public IActionResult Delete(VillaNumberVM villaNumberVM)
         {
-            VillaNumber? objFromDb = _db.VillaNumbers.FirstOrDefault(v => v.Villa_Number == obj.Villa_Number);
+            VillaNumber? villaNumberFromDb = _db.VillaNumbers.FirstOrDefault(v => v.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
 
-            if (objFromDb is not null)
+            if (villaNumberFromDb is not null)
             {
-                _db.VillaNumbers.Remove(objFromDb);
+                _db.VillaNumbers.Remove(villaNumberFromDb);
                 _db.SaveChanges();
                 TempData["success"] = "The villa Number has been deleted successfully";
                 return RedirectToAction("Index", "VillaNumber");
             }
-            TempData["error"] = "The villa Number can't be deleted";
-            return View(obj);
+
+            villaNumberVM.VillaList = _db.Villas.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Id.ToString()
+            });
+            return View(villaNumberVM);
         }
     }
 }
