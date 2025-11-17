@@ -1,4 +1,5 @@
-﻿using EasyStay.Domain.Entities;
+﻿using EasyStay.Application.Common.Interfaces;
+using EasyStay.Domain.Entities;
 using EasyStay.Infrastructure.Data;
 using EasyStay.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,15 @@ namespace EasyStay.Web.Controllers
 {
     public class VillaNumberController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaNumberController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+        public VillaNumberController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
         [HttpGet]
         public IActionResult Index()
         {
-            var villaNumbers = _db.VillaNumbers.Include(vn => vn.Villa).ToList();
+            var villaNumbers = _unitOfWork.VillaNumber.GetAll(includeProperties : "Villa");
             return View(villaNumbers);
         }
         [HttpGet]
@@ -25,7 +26,7 @@ namespace EasyStay.Web.Controllers
         {
             VillaNumberVM villaNumber = new()
             {
-                VillaList = _db.Villas.Select(i => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
                 {
                     Text = i.Name,
                     Value = i.Id.ToString()
@@ -36,20 +37,21 @@ namespace EasyStay.Web.Controllers
         [HttpPost]
         public IActionResult Create(VillaNumberVM obj)
         {
-            var isVillaNumberExists = _db.VillaNumbers.Any(vn => vn.Villa_Number == obj.VillaNumber.Villa_Number);
+            var isVillaNumberExists = _unitOfWork.VillaNumber.GetAll()
+                .Any(vn => vn.Villa_Number == obj.VillaNumber.Villa_Number);
             
             if (ModelState.IsValid && !isVillaNumberExists)
             {
-                _db.VillaNumbers.Add(obj.VillaNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Add(obj.VillaNumber);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa Number has been created successfully";
-                return RedirectToAction("Index","VillaNumber");
+                return RedirectToAction(nameof(Index));
             }
             if (isVillaNumberExists)
             {
                 TempData["error"] = "The villa Number aleady exists";
             }
-            obj.VillaList = _db.Villas.Select(i => new SelectListItem
+            obj.VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
             {
                 Text = i.Name,
                 Value = i.Id.ToString()
@@ -62,12 +64,12 @@ namespace EasyStay.Web.Controllers
             
             VillaNumberVM villaNumber = new()
             {
-                VillaList = _db.Villas.Select(i => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
                 {
                     Text = i.Name,
                     Value = i.Id.ToString()
                 }),
-                VillaNumber = _db.VillaNumbers.FirstOrDefault(u => u.Villa_Number == villaNumberId)
+                VillaNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_Number == villaNumberId)
             };
             if (villaNumber.VillaNumber is null)
             {
@@ -80,13 +82,13 @@ namespace EasyStay.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.VillaNumbers.Update(villaNumberVM.VillaNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Update(villaNumberVM.VillaNumber);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa Number has been updated successfully";
-                return RedirectToAction("Index", "VillaNumber");
+                return RedirectToAction(nameof(Index));
             }
 
-            villaNumberVM.VillaList = _db.Villas.Select(i => new SelectListItem
+            villaNumberVM.VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
             {
                 Text = i.Name,
                 Value = i.Id.ToString()
@@ -98,12 +100,12 @@ namespace EasyStay.Web.Controllers
         {
             VillaNumberVM villaNumber = new()
             {
-                VillaList = _db.Villas.Select(i => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
                 {
                     Text = i.Name,
                     Value = i.Id.ToString()
                 }),
-                VillaNumber = _db.VillaNumbers.FirstOrDefault(u => u.Villa_Number == villaNumberId)
+                VillaNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_Number == villaNumberId)
             };
             if (villaNumber.VillaNumber is null)
             {
@@ -114,17 +116,17 @@ namespace EasyStay.Web.Controllers
         [HttpPost]
         public IActionResult Delete(VillaNumberVM villaNumberVM)
         {
-            VillaNumber? villaNumberFromDb = _db.VillaNumbers.FirstOrDefault(v => v.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
+            VillaNumber? villaNumberFromDb = _unitOfWork.VillaNumber.Get(v => v.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
 
             if (villaNumberFromDb is not null)
             {
-                _db.VillaNumbers.Remove(villaNumberFromDb);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Remove(villaNumberFromDb);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa Number has been deleted successfully";
-                return RedirectToAction("Index", "VillaNumber");
+                return RedirectToAction(nameof(Index));
             }
 
-            villaNumberVM.VillaList = _db.Villas.Select(i => new SelectListItem
+            villaNumberVM.VillaList = _unitOfWork.Villa.GetAll().Select(i => new SelectListItem
             {
                 Text = i.Name,
                 Value = i.Id.ToString()

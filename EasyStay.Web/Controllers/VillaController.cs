@@ -1,4 +1,5 @@
-﻿using EasyStay.Domain.Entities;
+﻿using EasyStay.Application.Common.Interfaces;
+using EasyStay.Domain.Entities;
 using EasyStay.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,15 +7,15 @@ namespace EasyStay.Web.Controllers
 {
     public class VillaController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+        public VillaController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
         [HttpGet]
         public IActionResult Index()
         {
-            var villas = _db.Villas.ToList();
+            var villas = _unitOfWork.Villa.GetAll();
             return View(villas);
         }
         [HttpGet]
@@ -28,10 +29,10 @@ namespace EasyStay.Web.Controllers
             
             if (ModelState.IsValid)
             {
-                _db.Villas.Add(obj);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Add(obj);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been created successfully";
-                return RedirectToAction("Index","Villa");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "The villa can't be created";
             return View(obj);
@@ -39,7 +40,7 @@ namespace EasyStay.Web.Controllers
         [HttpGet]
         public IActionResult Update(int villaId)
         {
-            Villa? villa = _db.Villas.FirstOrDefault(u => u.Id == villaId);
+            Villa? villa = _unitOfWork.Villa.Get(u => u.Id == villaId);
             if (villa is null)
             {
                 return RedirectToAction("Error","Home");
@@ -51,10 +52,10 @@ namespace EasyStay.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Villas.Update(obj);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Update(obj);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been updated successfully";
-                return RedirectToAction("Index", "Villa");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "The villa can't be updated";
             return View(obj);
@@ -62,7 +63,7 @@ namespace EasyStay.Web.Controllers
         [HttpGet]
         public IActionResult Delete(int villaId)
         {
-            Villa? villa = _db.Villas.FirstOrDefault(u => u.Id == villaId);
+            Villa? villa = _unitOfWork.Villa.Get(u => u.Id == villaId);
             if (villa is null)
             {
                 return RedirectToAction("Error","Home");
@@ -72,14 +73,14 @@ namespace EasyStay.Web.Controllers
         [HttpPost]
         public IActionResult Delete(Villa obj)
         {
-            Villa? villaFromDb = _db.Villas.FirstOrDefault(v => v.Id == obj.Id);
+            Villa? villaFromDb = _unitOfWork.Villa.Get(v => v.Id == obj.Id);
 
             if (villaFromDb is not null)
             {
-                _db.Villas.Remove(villaFromDb);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Remove(villaFromDb);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa has been deleted successfully";
-                return RedirectToAction("Index", "Villa");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "The villa can't be deleted";
             return View(obj);

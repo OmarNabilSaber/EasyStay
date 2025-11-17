@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EasyStay.Domain\EasyStay.Domain.csproj" />
+    <ProjectReference Include="..\EasyStay.Application\EasyStay.Application.csproj" />
   </ItemGroup>
 
 </Project>
