@@ -8,9 +8,11 @@ namespace EasyStay.Web.Controllers
     public class VillaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public VillaController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public VillaController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         [HttpGet]
         public IActionResult Index()
@@ -29,6 +31,22 @@ namespace EasyStay.Web.Controllers
             
             if (ModelState.IsValid)
             {
+                if(obj.Image is not null)
+                {
+                    var imageName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(_webHostEnvironment.WebRootPath, @"images\Villas");
+                    var extension = Path.GetExtension(obj.Image.FileName);
+                    using (var fileStreams = new FileStream(Path.Combine(uploads, imageName + extension), FileMode.Create))
+                    {
+                        obj.Image.CopyTo(fileStreams);
+                    }
+                    obj.ImageUrl = @"\images\Villas\" + imageName + extension;
+                }
+                else
+                {
+                    obj.ImageUrl = "https://placehold.co/600x400";
+                }
+
                 _unitOfWork.Villa.Add(obj);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been created successfully";
@@ -52,6 +70,28 @@ namespace EasyStay.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (obj.Image is not null)
+                {
+                    var imageName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(_webHostEnvironment.WebRootPath, @"images\Villas");
+                    var extension = Path.GetExtension(obj.Image.FileName);
+                    if (obj.ImageUrl is not null)
+                    {
+                        var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldFilePath))
+                            System.IO.File.Delete(oldFilePath);
+                    }
+                    using (var fileStreams = new FileStream(Path.Combine(uploads, imageName + extension), FileMode.Create))
+                    {
+                        obj.Image.CopyTo(fileStreams);
+                    }
+                    obj.ImageUrl = @"\images\Villas\" + imageName + extension;
+                }
+                else
+                {
+                    if (obj.ImageUrl is null)
+                        obj.ImageUrl = "https://placehold.co/600x400";
+                }
                 _unitOfWork.Villa.Update(obj);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been updated successfully";
@@ -77,6 +117,12 @@ namespace EasyStay.Web.Controllers
 
             if (villaFromDb is not null)
             {
+                if (villaFromDb.ImageUrl is not null)
+                {
+                    var filePath = Path.Combine(_webHostEnvironment.WebRootPath, villaFromDb.ImageUrl.TrimStart('\\'));
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+                }
                 _unitOfWork.Villa.Remove(villaFromDb);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been deleted successfully";
