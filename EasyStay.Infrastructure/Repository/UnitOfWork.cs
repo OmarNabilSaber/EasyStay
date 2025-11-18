@@ -11,11 +11,14 @@ namespace EasyStay.Infrastructure.Repository
     {
         public IVillaRepository Villa { get; private set; }
         public IVillaNumberRepository VillaNumber { get; private set; }
+        public IAmenityRepository Amenity { get; set; }
+
         private readonly ApplicationDbContext _db;
         public UnitOfWork(ApplicationDbContext db)
         {
             Villa = new VillaRepository(db);
             VillaNumber = new VillaNumberRepository(db);
+            Amenity = new AmenityRepository(db);
             _db = db;
         }
         public void Save()

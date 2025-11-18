@@ -10,6 +10,7 @@ namespace EasyStay.Application.Common.Interfaces
     {
         public IVillaRepository Villa { get; }
         public IVillaNumberRepository VillaNumber { get; }
+        public IAmenityRepository Amenity { get; }
         void Save();
     }
 }
