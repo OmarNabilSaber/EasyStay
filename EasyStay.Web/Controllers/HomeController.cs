@@ -1,21 +1,30 @@
 using System.Diagnostics;
+using EasyStay.Application.Common.Interfaces;
 using EasyStay.Web.Models;
+using EasyStay.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EasyStay.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IUnitOfWork unitOfWork)
         {
-            _logger = logger;
+            
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            return View();
+            HomeVM homeVM = new HomeVM()
+            {
+                VillaList = _unitOfWork.Villa.GetAll(includeProperties: "VillaAmenity"),
+                CheckInDate = DateOnly.FromDateTime(DateTime.Now),
+                Nights = 1
+            };
+            return View(homeVM);
         }
 
         public IActionResult Privacy()
