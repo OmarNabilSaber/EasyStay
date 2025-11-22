@@ -12,18 +12,111 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EasyStay.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251110110753_addvillaNumber")]
-    partial class addvillaNumber
+    [Migration("20251122120032_addingVilla,VillaNumber,Amenity")]
+    partial class addingVillaVillaNumberAmenity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.21")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("EasyStay.Domain.Entities.Amenity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VillaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VillaId");
+
+                    b.ToTable("Amenities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Private Pool",
+                            VillaId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Microwave",
+                            VillaId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Private Balcony",
+                            VillaId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "1 king bed and 1 sofa bed",
+                            VillaId = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Private Plunge Pool",
+                            VillaId = 2
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Microwave and Mini Refrigerator",
+                            VillaId = 2
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Private Balcony",
+                            VillaId = 2
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "king bed or 2 double beds",
+                            VillaId = 2
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Private Pool",
+                            VillaId = 3
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Jacuzzi",
+                            VillaId = 3
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Private Balcony",
+                            VillaId = 3
+                        });
+                });
 
             modelBuilder.Entity("EasyStay.Domain.Entities.Villa", b =>
                 {
@@ -135,8 +228,8 @@ namespace EasyStay.Infrastructure.Migrations
                         new
                         {
                             Villa_Number = 106,
-                            SpecialDetails = "This villa number 104 is a premium pool villa with all the premium facilities.",
-                            VillaId = 6
+                            SpecialDetails = "This villa number 106 is a premium pool villa with all the premium facilities.",
+                            VillaId = 1
                         },
                         new
                         {
@@ -176,6 +269,17 @@ namespace EasyStay.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EasyStay.Domain.Entities.Amenity", b =>
+                {
+                    b.HasOne("EasyStay.Domain.Entities.Villa", "Villa")
+                        .WithMany("VillaAmenity")
+                        .HasForeignKey("VillaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Villa");
+                });
+
             modelBuilder.Entity("EasyStay.Domain.Entities.VillaNumber", b =>
                 {
                     b.HasOne("EasyStay.Domain.Entities.Villa", "Villa")
@@ -185,6 +289,11 @@ namespace EasyStay.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Villa");
+                });
+
+            modelBuilder.Entity("EasyStay.Domain.Entities.Villa", b =>
+                {
+                    b.Navigation("VillaAmenity");
                 });
 #pragma warning restore 612, 618
         }

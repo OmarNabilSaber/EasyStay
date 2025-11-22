@@ -17,7 +17,7 @@ namespace EasyStay.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.21")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -225,8 +225,8 @@ namespace EasyStay.Infrastructure.Migrations
                         new
                         {
                             Villa_Number = 106,
-                            SpecialDetails = "This villa number 104 is a premium pool villa with all the premium facilities.",
-                            VillaId = 6
+                            SpecialDetails = "This villa number 106 is a premium pool villa with all the premium facilities.",
+                            VillaId = 1
                         },
                         new
                         {
@@ -269,7 +269,7 @@ namespace EasyStay.Infrastructure.Migrations
             modelBuilder.Entity("EasyStay.Domain.Entities.Amenity", b =>
                 {
                     b.HasOne("EasyStay.Domain.Entities.Villa", "Villa")
-                        .WithMany()
+                        .WithMany("VillaAmenity")
                         .HasForeignKey("VillaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -286,6 +286,11 @@ namespace EasyStay.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Villa");
+                });
+
+            modelBuilder.Entity("EasyStay.Domain.Entities.Villa", b =>
+                {
+                    b.Navigation("VillaAmenity");
                 });
 #pragma warning restore 612, 618
         }
