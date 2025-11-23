@@ -36,6 +36,10 @@ namespace EasyStay.Web.Controllers
                     var imageName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(_webHostEnvironment.WebRootPath, @"images\Villas");
                     var extension = Path.GetExtension(obj.Image.FileName);
+
+                    if (!Directory.Exists(uploads))
+                        Directory.CreateDirectory(uploads);
+
                     using (var fileStreams = new FileStream(Path.Combine(uploads, imageName + extension), FileMode.Create))
                     {
                         obj.Image.CopyTo(fileStreams);
@@ -75,6 +79,10 @@ namespace EasyStay.Web.Controllers
                     var imageName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(_webHostEnvironment.WebRootPath, @"images\Villas");
                     var extension = Path.GetExtension(obj.Image.FileName);
+
+                    if (!Directory.Exists(uploads))
+                        Directory.CreateDirectory(uploads);
+
                     if (obj.ImageUrl is not null)
                     {
                         var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
